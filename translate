@@ -1,0 +1,34 @@
+#!/usr/bin/env python
+
+import argparse
+import random
+
+import goslate
+
+if __name__ == '__main__':
+    gs = goslate.Goslate()
+    languages = gs.get_languages()
+
+    parser = argparse.ArgumentParser(description='Translate badly.')
+    parser.add_argument('--language', '-l', choices=list(sorted(languages)),
+            default='pl', help='source and destination language')
+    parser.add_argument('--steps', '-s', type=int, default=10, help='step count')
+    parser.add_argument('--show-steps', '-S', action='store_true')
+    parser.add_argument('text', nargs=argparse.REMAINDER)
+
+    args = parser.parse_args()
+
+    lang_chain = set(languages)
+    lang_chain.remove(args.language)
+    lang_chain = list(languages)
+    random.shuffle(lang_chain)
+    lang_chain = lang_chain[:args.steps] + [args.language]
+    last = args.language
+    text = ' '.join(args.text)
+    for language in lang_chain:
+        text = gs.translate(text, language, last)
+        last = language
+        if args.show_steps:
+            print '%20s: %s' % (languages[language], text)
+    if not args.show_steps:
+        print text
