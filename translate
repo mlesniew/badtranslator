@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# PYTHON_ARGCOMPLETE_OK
+
 import argparse
 import random
 
@@ -7,6 +9,12 @@ try:
     import goslate
 except ImportError:
     raise SystemExit('This tool requires goslate Python package.')
+
+try:
+    import argcomplete
+    completer = argcomplete.autocomplete
+except ImportError:
+    completer = lambda x: None
 
 if __name__ == '__main__':
     gs = goslate.Goslate()
@@ -19,6 +27,7 @@ if __name__ == '__main__':
     parser.add_argument('--show-steps', '-S', action='store_true')
     parser.add_argument('text', nargs=argparse.REMAINDER)
 
+    completer(parser)
     args = parser.parse_args()
 
     lang_chain = set(languages)
