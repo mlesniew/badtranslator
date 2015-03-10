@@ -3,7 +3,10 @@
 import argparse
 import random
 
-import goslate
+try:
+    import goslate
+except ImportError:
+    raise SystemExit('This tool requires goslate Python package.')
 
 if __name__ == '__main__':
     gs = goslate.Goslate()
