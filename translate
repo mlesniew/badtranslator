@@ -3,7 +3,10 @@
 # PYTHON_ARGCOMPLETE_OK
 
 import argparse
+import locale
 import random
+
+DEFAULT_LANGUAGE = 'en'
 
 try:
     import goslate
@@ -16,13 +19,33 @@ try:
 except ImportError:
     completer = lambda x: None
 
+
+def get_local_language(languages):
+    lang = locale.getdefaultlocale()[0]
+    if not lang:
+        return DEFAULT_LANGUAGE
+
+    lang = lang.lower()
+
+    if lang in languages:
+        return lang
+
+    if '_' in lang:
+        lang = lang[:lang.find('_')]
+
+    if lang in languages:
+        return lang
+
+    return DEFAULT_LANGUAGE
+
+
 if __name__ == '__main__':
     gs = goslate.Goslate()
     languages = gs.get_languages()
 
     parser = argparse.ArgumentParser(description='Translate badly.')
     parser.add_argument('--language', '-l', choices=list(sorted(languages)),
-            default='pl', help='source and destination language')
+            default=get_local_language(languages), help='source and destination language')
     parser.add_argument('--steps', '-s', type=int, default=10, help='step count')
     parser.add_argument('--show-steps', '-S', action='store_true')
     parser.add_argument('text', nargs=argparse.REMAINDER)
